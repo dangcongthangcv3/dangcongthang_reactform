@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+
 const initialState = {
     arrStudent: [{idStudent:'1', phone:'0909090909', name:'Nguyen Văn A', email:'a@gmail.com'}],
     values:{idStudent:'',phone:'', name:'', email:''},

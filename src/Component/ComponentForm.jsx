@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { addStudent,changeInfo } from '../Redux/reduce/sinhVienReducer'
+import { addStudent,changeInfo,updateStudent } from '../Redux/reduce/sinhVienReducer'
 
 class ComponentForm extends Component {
 
@@ -67,10 +67,10 @@ class ComponentForm extends Component {
                 </div>  
                 <div className="mb-3">
                     <button type='submit' className='btn btn-success'>Thêm sinh viên</button>
-                    {/* <button type='button' className='btn btn-success' onClick={()=>{
-                      let {updateProduct} = this.props
-                      updateProduct({...this.state.values})
-                    }}>Cập nhập sinh viên</button> */}
+                    <button type='button' className='btn btn-success' onClick={()=>{
+                      const action = updateStudent(values)
+                      this.props.dispatch(action)
+                    }}>Cập nhập sinh viên</button>
                 </div>
             </div>
             <div className="col-md-6">
