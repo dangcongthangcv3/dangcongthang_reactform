@@ -1,23 +1,29 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { delStudent, editStudent } from '../Redux/reduce/sinhVienReducer'
 
-export default class ComponentProfile extends Component {
+class ComponentProfile extends Component {
   renderProfile = ()=>{
-    let {arrProduct,delProduct,editProduct} = this.props
-    return arrProduct.map((prod)=>{
-      return <tr key={prod.idSV}>
-        <td>{prod.idSV}</td>
+    let {arrStudent} = this.props
+    return arrStudent.map((prod, index) => {
+      return <tr key={index}>
+        <td>{prod.idStudent}</td>
         <td>{prod.name}</td>
         <td>{prod.phone}</td>
         <td>{prod.email}</td>
         <td><button className='btn btn-danger' onClick={()=>{
-          delProduct(prod.idSV)
+          const action = delStudent(prod.idStudent)
+          this.props.dispatch(action);
         }}>Xóa</button>
         <button className='btn btn-primary' onClick={()=>{
-          editProduct(prod)
-        }}>Sửa</button></td>
+          const action = editStudent(prod.idStudent)
+          this.props.dispatch(action);
+        }}>Sửa</button>
+        </td>
       </tr>
     })
   }
+  
   render() {
     return (
       <table className='table'>
@@ -32,8 +38,17 @@ export default class ComponentProfile extends Component {
         </thead>
         <tbody>
           {this.renderProfile()}
+          <tr>
+          </tr>
         </tbody>
       </table>
     )
   }
 }
+
+const mapStateToProps = (state) => {
+  return{
+    arrStudent: state.sinhVienReducer.arrStudent
+  };
+}
+export default connect(mapStateToProps)(ComponentProfile)

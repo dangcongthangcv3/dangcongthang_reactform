@@ -1,91 +1,54 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { addStudent,changeInfo } from '../Redux/reduce/sinhVienReducer'
 
-export default class ComponentForm extends Component {
-  state = {
-    values:{
-      idSV:'',
-      phone:'',
-      name:'',
-      email:''
-    },
-    errors:{
-      idSV:'(*)',
-      phone:'(*)',
-      name:'(*)',
-      email:'(*)'
-    }
-  }
+class ComponentForm extends Component {
+
   handleSubmit = (e) =>{
     e.preventDefault()
-    for (let key in this.state.errors){
-      if(this.state.errors[key] !== ''){
-        alert('Dữ liệu chưa hợp lệ')
-        return;
-      }
-    }
-
-    let {addProduct} = this.props
-    //Nếu kiểm tra this.state.values hợp lệ thì mới cho addProduct
-    addProduct(this.state.values)
+    const action = addStudent(this.props.values)
+    this.props.dispatch(action)
   }
   handleChangeInput = (e) =>{
-    let {value,id} = e.target;
-    let dataType =e.target.getAttribute('data-type')
+    let {value, name} = e.target
+    let errorText = ''
 
-    let newValue = {...this.state.values}
-    newValue[id] = value
-
-    let newError = {...this.state.errors}
-    let messError = '';
-    if(value.trim()===""){
-      messError = id + ' không được bỏ trống';
-    }else{
-      if(dataType){
-        switch(dataType){
-          case 'ma': {
-            let regexNumber = /[0-9]$/
-            if(!regexNumber.test(value)){
-              messError = "Mã sv: 1";
-            };break
-          }
-          case 'name': {
-            let regexNumber = /[a-z A-Z]$/
-            if(!regexNumber.test(value)){
-              messError = 'họ tên: Nguyen Van A';
-            };break
-          }
-          case 'phone': {
-            let regexNumber = /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/
-            if(!regexNumber.test(value)){
-              messError = ' số điện thoại: 0909090909 ';
-            };break
-          }
-          case 'email': {
-            let regexNumber = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
-            if(!regexNumber.test(value)){
-              messError = ' email: test@gmail.com';
-            };break
-          }
-        }
+    if(value.trim()===''){
+      errorText = 'Vui lòng nhập thông tin'
+    }
+    if(name ==='idStudent'){
+      const regex = /[0-9]$/
+      if(!regex.test(value)){
+        errorText = 'Vui lòng nhập ký tự số'
       }
     }
-    newError[id] = messError
+    if(name ==='phone'){
+      const regex = /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/
+      if(!regex.test(value)){
+        errorText = 'Vui lòng nhập đúng số điện thoại'
+      }
+    }
+    if(name ==='name'){
+      const regex = /[a-z A-Z]$/
+      if(!regex.test(value)){
+        errorText = 'Vui lòng nhập chữ'
+      }
+    }
+    if(name ==='email'){
+      const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
+      if(!regex.test(value)){
+        errorText = 'Vui lòng nhập đúng định dạng email'
+      }
+    }
 
-    this.setState({
-      values: newValue,
-      errors: newError
-    },()=>{
-      console.log(this.state)
-    })
-  }
+    let values = {...this.props.values, [name]:value};
+    let errors = {...this.props.errors, [name]:errorText};
 
-  componentWillReceiveProps(newProps){
-    this.setState({
-      values:newProps.productEdit
-    })
+    const action = changeInfo({values,errors})
+    this.props.dispatch(action)
   }
   render() {
-    let {idSV,name,phone,email} = this.state.values
+    let {values, errors} = this.props
     return (
 
       <form onSubmit={this.handleSubmit}>
@@ -94,32 +57,32 @@ export default class ComponentForm extends Component {
             <div className="col-md-6">
                 <div className="mb-3">
                     <label htmlFor="idSV" >Mã SV</label>
-                    <input data-type="ma" value={idSV} className="form-control" id='idSV' name='idSV' onInput={this.handleChangeInput}/>
-                    <p className='text text-danger'>{this.state.errors.idSV}</p>
+                    <input value={values.idStudent} className="form-control" id='idStudent' name='idStudent' onInput={this.handleChangeInput}/>
+                    <p className='text text-danger'>{errors.idStudent}</p>
                 </div>
                 <div className="mb-3">
                     <label htmlFor="phone" >Số điện thoại</label>
-                    <input data-type='phone' value={phone} className="form-control" id='phone' name='phone' onInput={this.handleChangeInput}/>
-                    <p className='text text-danger'>{this.state.errors.phone}</p>
+                    <input value={values.phone} className="form-control" id='phone' name='phone' onInput={this.handleChangeInput}/>
+                    <p className='text text-danger'>{errors.phone}</p>
                 </div>  
                 <div className="mb-3">
                     <button type='submit' className='btn btn-success'>Thêm sinh viên</button>
-                    <button type='button' className='btn btn-success' onClick={()=>{
+                    {/* <button type='button' className='btn btn-success' onClick={()=>{
                       let {updateProduct} = this.props
                       updateProduct({...this.state.values})
-                    }}>Cập nhập sinh viên</button>
+                    }}>Cập nhập sinh viên</button> */}
                 </div>
             </div>
             <div className="col-md-6">
                 <div className="mb-3">
                     <label htmlFor="name" >Họ tên</label>
-                    <input data-type="name" value={name} className="form-control" id='name' name='name' onInput={this.handleChangeInput}/>
-                    <p className='text text-danger'>{this.state.errors.name}</p>
+                    <input value={values.name} className="form-control" id='name' name='name' onInput={this.handleChangeInput}/>
+                    <p className='text text-danger'>{errors.name}</p>
                 </div>
                 <div className="mb-3">
                     <label htmlFor="email" >Email</label>
-                    <input data-type="email" value={email} className="form-control" id='email' name='email' onInput={this.handleChangeInput}/>
-                    <p className='text text-danger'>{this.state.errors.email}</p>
+                    <input value={values.email} className="form-control" id='email' name='email' onInput={this.handleChangeInput}/>
+                    <p className='text text-danger'>{errors.email}</p>
                 </div>
             </div>
         </div>
@@ -127,3 +90,5 @@ export default class ComponentForm extends Component {
     )
   }
 }
+const mapStateToProps = (state) => state.sinhVienReducer
+export default connect(mapStateToProps)(ComponentForm)
